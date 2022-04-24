@@ -1,0 +1,85 @@
+--- a/drivers/usb/serial/option.c
++++ b/drivers/usb/serial/option.c
+@@ -241,6 +241,12 @@
+ /* These Quectel products use Quectel's vendor ID */
+ #define QUECTEL_PRODUCT_EC21			0x0121
+ #define QUECTEL_PRODUCT_EC25			0x0125
++#define QUECTEL_PRODUCT_BG96			0x0296
++#define QUECTEL_PRODUCT_EP06			0x0306
++#define QUECTEL_PRODUCT_EM12			0x0512
++#define QUECTEL_PRODUCT_RM500Q		0x0800
++#define QUECTEL_PRODUCT_EC200S_CN		0x6002
++#define QUECTEL_PRODUCT_EC200T		0x6026
+ 
+ #define CMOTECH_VENDOR_ID			0x16d8
+ #define CMOTECH_PRODUCT_6001			0x6001
+@@ -669,11 +675,46 @@
+ 	.reserved = BIT(4) | BIT(5),
+ };
+ 
++#define ZLP		BIT(17)
++
+ static const struct usb_device_id option_ids[] = {
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_COLT) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_LIGHT) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x12) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x03, 0x12) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x06, 0x12) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x14) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x13) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x03) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x0a) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x06) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x8101, 0xff, 0x02, 0x01) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(0x2c7c, 0x0900, 0xff, 0x00, 0x00) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_QUAD) },
++#if 1 //Added by Quectel
++	{ USB_DEVICE(0x05C6, 0x9090) }, /* Quectel UC15 */
++	{ USB_DEVICE(0x05C6, 0x9003) }, /* Quectel UC20 */
++	{ USB_DEVICE(0x05C6, 0x9215) }, /* Quectel EC20(MDM9215) */
++	{ USB_DEVICE(0x2C7C, 0x0125) }, /* Quectel EC20(MDM9x07)/EC25/EG25 */
++	{ USB_DEVICE(0x2C7C, 0x0121) }, /* Quectel EC21 */
++	{ USB_DEVICE(0x2C7C, 0x0191) }, /* Quectel EG91 */
++	{ USB_DEVICE(0x2C7C, 0x0195) }, /* Quectel EG95 */
++	{ USB_DEVICE(0x2C7C, 0x0306) }, /* Quectel EG06/EP06/EM06 */
++	{ USB_DEVICE(0x2C7C, 0x0512) }, /* Quectel EG12/EP12/EM12/EG16/EG18 */
++	{ USB_DEVICE(0x2C7C, 0x0296) }, /* Quectel BG96 */
++	{ USB_DEVICE(0x2C7C, 0x0700) }, /* Quectel BG95/BG77/BG600L-M3/BC69 */
++	{ USB_DEVICE(0x2C7C, 0x0435) }, /* Quectel AG35 */
++	{ USB_DEVICE(0x2C7C, 0x0415) }, /* Quectel AG15 */
++	{ USB_DEVICE(0x2C7C, 0x0452) }, /* Quectel AG520 */
++	{ USB_DEVICE(0x2C7C, 0x0455) }, /* Quectel AG550 */
++	{ USB_DEVICE(0x2C7C, 0x0620) }, /* Quectel EG20 */
++	{ USB_DEVICE(0x2C7C, 0x0800) }, /* Quectel RG500/RM500/RG510/RM510 */
++	{ USB_DEVICE(0x2C7C, 0x6026) }, /* Quectel EC200 */
++	{ USB_DEVICE(0x2C7C, 0x6120) }, /* Quectel UC200 */
++	{ USB_DEVICE(0x2C7C, 0x6000) }, /* Quectel EC200/UC200 */
++	{ .match_flags = USB_DEVICE_ID_MATCH_VENDOR, .idVendor = 0x2C7C }, /* Match All Quectel Modules */
+++#endif
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_QUAD_LIGHT) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_NDIS) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_NDIS_LIGHT) },
+@@ -1178,6 +1219,12 @@
+ 	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
+ 	{ USB_DEVICE(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EC25),
+ 	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0xff, 0x30) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0xff, 0x10),
++	  .driver_info = ZLP },
++	
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6003),
+@@ -2057,6 +2104,9 @@
+ #ifdef CONFIG_PM
+ 	.suspend           = usb_wwan_suspend,
+ 	.resume            = usb_wwan_resume,
++	#if 1 //Added by Quectel
++	.reset_resume = usb_wwan_resume,
++	#endif
+ #endif
+ };
+ 
